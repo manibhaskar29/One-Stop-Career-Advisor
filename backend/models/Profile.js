@@ -37,8 +37,8 @@ const profileSchema = new mongoose.Schema({
     },
     languagePreference: {
         type: String,
-        default: 'en',
-        enum: ['en', 'hi', 'mr', 'ta', 'te', 'kn', 'gu', 'bn']
+        default: 'English',
+        enum: ['English', 'Hindi', 'Regional']
     },
     academicPerformance: {
         percentage: {

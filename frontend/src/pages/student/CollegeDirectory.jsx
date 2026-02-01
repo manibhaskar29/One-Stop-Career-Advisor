@@ -1,138 +1,139 @@
-import { useState, useEffect } from 'react';
-import { collegeAPI } from '../../services/api';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+    Box,
+    Container,
+    AppBar,
+    Toolbar,
+    IconButton,
+    Typography,
+    TextField,
+    InputAdornment,
+} from '@mui/material';
+import {
+    ArrowBack,
+    School as SchoolIcon,
+    Search as SearchIcon,
+} from '@mui/icons-material';
+import { DataGrid } from '@mui/x-data-grid';
+
+const colleges = [
+    { id: 1, name: 'MIT', location: 'Cambridge, MA', ranking: 1, tuition: '$53,818', acceptance: '4%', type: 'Private' },
+    { id: 2, name: 'Stanford University', location: 'Stanford, CA', ranking: 2, tuition: '$55,473', acceptance: '4%', type: 'Private' },
+    { id: 3, name: 'Harvard University', location: 'Cambridge, MA', ranking: 3, tuition: '$51,925', acceptance: '5%', type: 'Private' },
+    { id: 4, name: 'UC Berkeley', location: 'Berkeley, CA', ranking: 4, tuition: '$43,176', acceptance: '15%', type: 'Public' },
+    { id: 5, name: 'Caltech', location: 'Pasadena, CA', ranking: 5, tuition: '$56,394', acceptance: '3%', type: 'Private' },
+    { id: 6, name: 'Carnegie Mellon', location: 'Pittsburgh, PA', ranking: 6, tuition: '$58,924', acceptance: '15%', type: 'Private' },
+    { id: 7, name: 'UCLA', location: 'Los Angeles, CA', ranking: 7, tuition: '$42,218', acceptance: '12%', type: 'Public' },
+    { id: 8, name: 'University of Michigan', location: 'Ann Arbor, MI', ranking: 8, tuition: '$51,200', acceptance: '23%', type: 'Public' },
+    { id: 9, name: 'Georgia Tech', location: 'Atlanta, GA', ranking: 9, tuition: '$33,794', acceptance: '21%', type: 'Public' },
+    { id: 10, name: 'UT Austin', location: 'Austin, TX', ranking: 10, tuition: '$38,326', acceptance: '32%', type: 'Public' },
+];
 
 const CollegeDirectory = () => {
-    const [loading, setLoading] = useState(true);
-    const [colleges, setColleges] = useState([]);
-    const [filters, setFilters] = useState({ state: '', district: '', search: '' });
+    const navigate = useNavigate();
+    const [searchQuery, setSearchQuery] = useState('');
 
-    useEffect(() => {
-        fetchColleges();
-    }, []);
+    const columns = [
+        {
+            field: 'ranking',
+            headerName: 'Rank',
+            width: 80,
+            align: 'center',
+            headerAlign: 'center',
+        },
+        {
+            field: 'name',
+            headerName: 'College Name',
+            width: 250,
+            renderCell: (params) => (
+                <Typography fontWeight={600}>{params.value}</Typography>
+            ),
+        },
+        {
+            field: 'location',
+            headerName: 'Location',
+            width: 200,
+        },
+        {
+            field: 'type',
+            headerName: 'Type',
+            width: 120,
+        },
+        {
+            field: 'tuition',
+            headerName: 'Tuition',
+            width: 130,
+        },
+        {
+            field: 'acceptance',
+            headerName: 'Acceptance Rate',
+            width: 150,
+        },
+    ];
 
-    const fetchColleges = async () => {
-        try {
-            const res = await collegeAPI.getAll();
-            setColleges(res.data.data);
-        } catch (err) {
-            console.error('Failed to fetch colleges:', err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const filteredColleges = colleges.filter(college => {
-        const matchesState = !filters.state || college.location.state === filters.state;
-        const matchesDistrict = !filters.district || college.location.district.toLowerCase().includes(filters.district.toLowerCase());
-        const matchesSearch = !filters.search || college.name.toLowerCase().includes(filters.search.toLowerCase());
-        return matchesState && matchesDistrict && matchesSearch;
-    });
-
-    const states = [...new Set(colleges.map(c => c.location.state))].sort();
-
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading colleges...</p>
-                </div>
-            </div>
-        );
-    }
+    const filteredColleges = colleges.filter((college) =>
+        college.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        college.location.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <h1 className="text-3xl font-display font-bold mb-2">Government College Directory</h1>
-                <p className="text-gray-600 mb-8">Explore {colleges.length} government colleges across India</p>
+        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+            <AppBar position="static">
+                <Toolbar>
+                    <IconButton color="inherit" onClick={() => navigate('/student/dashboard')}>
+                        <ArrowBack />
+                    </IconButton>
+                    <SchoolIcon sx={{ ml: 2, mr: 2 }} />
+                    <Typography variant="h6" fontWeight={700}>
+                        College Directory
+                    </Typography>
+                </Toolbar>
+            </AppBar>
 
-                {/* Filters */}
-                <div className="card mb-8 p-6">
-                    <div className="grid md:grid-cols-3 gap-4">
-                        <input
-                            type="text"
-                            placeholder="Search by college name..."
-                            value={filters.search}
-                            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                            className="input"
-                        />
-                        <select
-                            value={filters.state}
-                            onChange={(e) => setFilters({ ...filters, state: e.target.value })}
-                            className="input"
-                        >
-                            <option value="">All States</option>
-                            {states.map(state => (
-                                <option key={state} value={state}>{state}</option>
-                            ))}
-                        </select>
-                        <input
-                            type="text"
-                            placeholder="Search by district..."
-                            value={filters.district}
-                            onChange={(e) => setFilters({ ...filters, district: e.target.value })}
-                            className="input"
-                        />
-                    </div>
-                </div>
+            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+                <Typography variant="h4" fontWeight={700} gutterBottom>
+                    Explore Colleges
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                    Search and compare top colleges to find your perfect fit
+                </Typography>
 
-                {/* Results */}
-                <div className="mb-4 text-gray-600">
-                    Showing {filteredColleges.length} college(s)
-                </div>
+                <TextField
+                    fullWidth
+                    placeholder="Search by college name or location..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    sx={{ mb: 3 }}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
 
-                <div className="grid md:grid-cols-2 gap-6">
-                    {filteredColleges.map((college, index) => (
-                        <div key={index} className="card">
-                            <h3 className="text-lg font-bold mb-2">{college.name}</h3>
-                            <p className="text-sm text-gray-600 mb-4">
-                                📍 {college.location.city}, {college.location.district}, {college.location.state}
-                            </p>
-
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {college.facilities.hostel && <span className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded">🏠 Hostel</span>}
-                                {college.facilities.library && <span className="text-xs px-2 py-1 bg-purple-50 text-purple-700 rounded">📚 Library</span>}
-                                {college.facilities.labs && <span className="text-xs px-2 py-1 bg-green-50 text-green-700 rounded">🔬 Labs</span>}
-                                {college.facilities.sports && <span className="text-xs px-2 py-1 bg-orange-50 text-orange-700 rounded">⚽ Sports</span>}
-                                {college.facilities.canteen && <span className="text-xs px-2 py-1 bg-red-50 text-red-700 rounded">🍽️ Canteen</span>}
-                            </div>
-
-                            <div className="text-sm space-y-2">
-                                <div>
-                                    <strong>Type:</strong> <span className="text-gray-600">{college.type}</span>
-                                </div>
-                                <div>
-                                    <strong>Medium:</strong> <span className="text-gray-600">{college.mediumOfInstruction.join(', ')}</span>
-                                </div>
-                                <div>
-                                    <strong>Courses:</strong> <span className="text-gray-600">{college.coursesOffered.length} programs</span>
-                                </div>
-                                {college.contactInfo?.phone && (
-                                    <div>
-                                        <strong>Phone:</strong> <span className="text-gray-600">{college.contactInfo.phone}</span>
-                                    </div>
-                                )}
-                                {college.contactInfo?.website && (
-                                    <div>
-                                        <strong>Website:</strong>{' '}
-                                        <a href={`https://${college.contactInfo.website}`} target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">
-                                            {college.contactInfo.website}
-                                        </a>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {filteredColleges.length === 0 && (
-                    <div className="text-center py-12 text-gray-500">
-                        No colleges found matching your filters
-                    </div>
-                )}
-            </div>
-        </div>
+                <Box sx={{ height: 600, width: '100%', bgcolor: 'white', borderRadius: 2 }}>
+                    <DataGrid
+                        rows={filteredColleges}
+                        columns={columns}
+                        pageSize={10}
+                        rowsPerPageOptions={[10, 25, 50]}
+                        disableSelectionOnClick
+                        sx={{
+                            border: 'none',
+                            '& .MuiDataGrid-cell:focus': {
+                                outline: 'none',
+                            },
+                            '& .MuiDataGrid-row:hover': {
+                                bgcolor: 'primary.50',
+                            },
+                        }}
+                    />
+                </Box>
+            </Container>
+        </Box>
     );
 };
 

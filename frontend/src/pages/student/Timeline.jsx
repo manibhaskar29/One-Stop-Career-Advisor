@@ -1,143 +1,174 @@
-import { useState, useEffect } from 'react';
-import { timelineAPI } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
+import {
+    Box,
+    Container,
+    AppBar,
+    Toolbar,
+    IconButton,
+    Typography,
+    Card,
+    CardContent,
+    Chip,
+    Stack,
+} from '@mui/material';
+import {
+    Timeline as MuiTimeline,
+    TimelineItem,
+    TimelineSeparator,
+    TimelineConnector,
+    TimelineContent,
+    TimelineDot,
+    TimelineOppositeContent,
+} from '@mui/lab';
+import {
+    ArrowBack,
+    Timeline as TimelineIcon,
+    CheckCircle,
+    RadioButtonUnchecked,
+    Assignment,
+    School,
+    Work,
+    EmojiEvents,
+} from '@mui/icons-material';
+
+const milestones = [
+    {
+        id: 1,
+        title: 'Complete Profile Setup',
+        description: 'Fill out your personal information and preferences',
+        date: 'Completed',
+        status: 'completed',
+        icon: <CheckCircle />,
+        color: 'success',
+    },
+    {
+        id: 2,
+        title: 'Take Career Assessment',
+        description: 'Complete the comprehensive career quiz',
+        date: 'Completed',
+        status: 'completed',
+        icon: <Assignment />,
+        color: 'success',
+    },
+    {
+        id: 3,
+        title: 'Review Recommendations',
+        description: 'Explore personalized career suggestions',
+        date: 'In Progress',
+        status: 'in-progress',
+        icon: <RadioButtonUnchecked />,
+        color: 'primary',
+    },
+    {
+        id: 4,
+        title: 'Research Colleges',
+        description: 'Browse and shortlist colleges that match your goals',
+        date: 'Upcoming',
+        status: 'upcoming',
+        icon: <School />,
+        color: 'grey',
+    },
+    {
+        id: 5,
+        title: 'Apply to Programs',
+        description: 'Submit applications to your chosen colleges',
+        date: 'Upcoming',
+        status: 'upcoming',
+        icon: <Work />,
+        color: 'grey',
+    },
+    {
+        id: 6,
+        title: 'Start Your Career Journey',
+        description: 'Begin your path towards your dream career',
+        date: 'Future Goal',
+        status: 'upcoming',
+        icon: <EmojiEvents />,
+        color: 'grey',
+    },
+];
 
 const Timeline = () => {
-    const [loading, setLoading] = useState(true);
-    const [events, setEvents] = useState([]);
-    const [filter, setFilter] = useState('all');
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        fetchEvents();
-    }, []);
+    const getStatusChip = (status) => {
+        const statusConfig = {
+            completed: { label: 'Completed', color: 'success' },
+            'in-progress': { label: 'In Progress', color: 'primary' },
+            upcoming: { label: 'Upcoming', color: 'default' },
+        };
 
-    const fetchEvents = async () => {
-        try {
-            const res = await timelineAPI.getAll();
-            setEvents(res.data.data);
-        } catch (err) {
-            console.error('Failed to fetch timeline:', err);
-        } finally {
-            setLoading(false);
-        }
+        const config = statusConfig[status];
+        return <Chip label={config.label} color={config.color} size="small" />;
     };
-
-    const filteredEvents = events.filter(event =>
-        filter === 'all' || event.type === filter
-    );
-
-    const getEventIcon = (type) => {
-        switch (type) {
-            case 'exam': return '📝';
-            case 'admission': return '🎓';
-            case 'scholarship': return '💰';
-            case 'counseling': return '🗓️';
-            default: return '📅';
-        }
-    };
-
-    const isUpcoming = (date) => new Date(date) > new Date();
-    const isPast = (date) => new Date(date) < new Date();
-
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading timeline...</p>
-                </div>
-            </div>
-        );
-    }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-5xl mx-auto px-4 py-8">
-                <h1 className="text-3xl font-display font-bold mb-2">Important Dates & Timeline</h1>
-                <p className="text-gray-600 mb-8">Stay updated with admissions, exams, and scholarship deadlines</p>
+        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+            <AppBar position="static">
+                <Toolbar>
+                    <IconButton color="inherit" onClick={() => navigate('/student/dashboard')}>
+                        <ArrowBack />
+                    </IconButton>
+                    <TimelineIcon sx={{ ml: 2, mr: 2 }} />
+                    <Typography variant="h6" fontWeight={700}>
+                        Career Timeline
+                    </Typography>
+                </Toolbar>
+            </AppBar>
 
-                {/* Filters */}
-                <div className="flex gap-2 mb-8 overflow-x-auto">
-                    {['all', 'exam', 'admission', 'scholarship', 'counseling'].map(type => (
-                        <button
-                            key={type}
-                            onClick={() => setFilter(type)}
-                            className={`px-4 py-2 rounded-lg capitalize font-medium whitespace-nowrap ${filter === type
-                                    ? 'bg-primary-600 text-white'
-                                    : 'bg-white text-gray-700 hover:bg-gray-50'
-                                }`}
-                        >
-                            {type === 'all' ? 'All Events' : type}
-                        </button>
+            <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+                <Typography variant="h4" fontWeight={700} gutterBottom>
+                    Your Career Journey
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                    Track your progress and upcoming milestones
+                </Typography>
+
+                <MuiTimeline position="alternate">
+                    {milestones.map((milestone, index) => (
+                        <TimelineItem key={milestone.id}>
+                            <TimelineOppositeContent color="text.secondary">
+                                <Typography variant="body2" fontWeight={600}>
+                                    {milestone.date}
+                                </Typography>
+                            </TimelineOppositeContent>
+
+                            <TimelineSeparator>
+                                <TimelineDot color={milestone.color}>
+                                    {milestone.icon}
+                                </TimelineDot>
+                                {index < milestones.length - 1 && <TimelineConnector />}
+                            </TimelineSeparator>
+
+                            <TimelineContent>
+                                <Card
+                                    sx={{
+                                        opacity: milestone.status === 'upcoming' ? 0.7 : 1,
+                                        transition: 'all 0.3s ease',
+                                        '&:hover': {
+                                            transform: 'scale(1.02)',
+                                            boxShadow: 4,
+                                        },
+                                    }}
+                                >
+                                    <CardContent>
+                                        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+                                            <Typography variant="h6" fontWeight={600}>
+                                                {milestone.title}
+                                            </Typography>
+                                            {getStatusChip(milestone.status)}
+                                        </Stack>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {milestone.description}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </TimelineContent>
+                        </TimelineItem>
                     ))}
-                </div>
-
-                {/* Timeline */}
-                <div className="space-y-4">
-                    {filteredEvents.map((event, index) => {
-                        const upcoming = isUpcoming(event.startDate);
-                        return (
-                            <div key={index} className={`card ${upcoming ? 'border-l-4 border-primary-600' : 'opacity-75'}`}>
-                                <div className="flex items-start gap-4">
-                                    <div className="text-4xl flex-shrink-0">{getEventIcon(event.type)}</div>
-                                    <div className="flex-1">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div>
-                                                <h3 className="text-lg font-bold">{event.title}</h3>
-                                                <div className="flex gap-2 mt-1">
-                                                    <span className={`text-xs px-2 py-1 rounded-full capitalize ${event.type === 'exam' ? 'bg-blue-100 text-blue-700' :
-                                                            event.type === 'admission' ? 'bg-green-100 text-green-700' :
-                                                                event.type === 'scholarship' ? 'bg-yellow-100 text-yellow-700' :
-                                                                    'bg-purple-100 text-purple-700'
-                                                        }`}>
-                                                        {event.type}
-                                                    </span>
-                                                    {event.priority === 'high' && (
-                                                        <span className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded-full">High Priority</span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            {upcoming && (
-                                                <span className="text-xs px-3 py-1 bg-green-500 text-white rounded-full font-medium">
-                                                    Upcoming
-                                                </span>
-                                            )}
-                                        </div>
-                                        <p className="text-gray-600 mb-3">{event.description}</p>
-                                        <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                                            <div>
-                                                <strong>Start:</strong> {new Date(event.startDate).toLocaleDateString('en-IN', {
-                                                    day: 'numeric',
-                                                    month: 'long',
-                                                    year: 'numeric'
-                                                })}
-                                            </div>
-                                            {event.endDate && event.startDate !== event.endDate && (
-                                                <div>
-                                                    <strong>End:</strong> {new Date(event.endDate).toLocaleDateString('en-IN', {
-                                                        day: 'numeric',
-                                                        month: 'long',
-                                                        year: 'numeric'
-                                                    })}
-                                                </div>
-                                            )}
-                                            <div>
-                                                <strong>For:</strong> {event.targetClass === 'both' ? 'Class 10 & 12' : `Class ${event.targetClass}`}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-
-                {filteredEvents.length === 0 && (
-                    <div className="text-center py-12 text-gray-500">
-                        No events found for this category
-                    </div>
-                )}
-            </div>
-        </div>
+                </MuiTimeline>
+            </Container>
+        </Box>
     );
 };
 

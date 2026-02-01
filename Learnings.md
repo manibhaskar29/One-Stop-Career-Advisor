@@ -599,3 +599,15 @@ Environment variables set
 API calls work with production backend
 Assets load correctly
 Routing works properly
+
+
+
+ Interview Talking Points
+
+*"I implemented a hybrid AI recommendation engine that combines rule-based scoring for efficiency with Google Gemini API for personalized insights. The system maps 22 assessment questions to 6 career categories using a weighted algorithm, then leverages generative AI to provide contextual reasoning and actionable career guidance."*
+
+This demonstrates:
+- AI/LLM integration skills
+- API design and error handling
+- Cost-conscious architecture (hybrid approach)
+- User experience optimization (loading states, fallbacks)

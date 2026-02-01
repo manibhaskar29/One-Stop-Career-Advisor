@@ -57,6 +57,7 @@ export const quizAPI = {
     submitQuiz: (responses) => api.post('/quiz/submit', { responses }),
     getResults: () => api.get('/quiz/results'),
     getResult: (id) => api.get(`/quiz/results/${id}`),
+    analyze: (data) => api.post('/quiz/analyze', data),
 };
 
 // Recommendations
