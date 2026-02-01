@@ -15,10 +15,6 @@ import {
     IconButton,
     Stack,
     Avatar,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
 } from '@mui/material';
 import {
     Email as EmailIcon,
@@ -28,7 +24,6 @@ import {
     VisibilityOff,
     PersonAdd as PersonAddIcon,
     Phone as PhoneIcon,
-    School as SchoolIcon,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 
@@ -243,23 +238,7 @@ const Register = () => {
                                     }}
                                 />
 
-                                <FormControl fullWidth>
-                                    <InputLabel>I am a</InputLabel>
-                                    <Select
-                                        name="role"
-                                        value={formData.role}
-                                        onChange={handleChange}
-                                        label="I am a"
-                                        startAdornment={
-                                            <InputAdornment position="start">
-                                                <SchoolIcon color="secondary" />
-                                            </InputAdornment>
-                                        }
-                                    >
-                                        <MenuItem value="student">Student</MenuItem>
-                                        <MenuItem value="admin">Admin</MenuItem>
-                                    </Select>
-                                </FormControl>
+
 
                                 <TextField
                                     fullWidth
